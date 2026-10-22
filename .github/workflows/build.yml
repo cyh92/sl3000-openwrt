@@ -98,27 +98,27 @@ jobs:
       #       feeds/packages/lang/golang/golang/Makefile
       #     echo "golang feed 已升级"
 
-      - name: 准备 golang 外部 bootstrap（go1.26 需 >=1.24 编译）
-        run: |
-          cd openwrt
-          # golang feed 自带 bootstrap 链只到 go1.20（1.4 -> 1.17 -> 1.20），
-          # 而 go1.26.8 源码要求编译它的 bootstrap 是 go1.24.6+（notgo124.go 检查）。
-          # 方案：下载官方 go1.24.13 linux-amd64 预编译包作外部 bootstrap，
-          # 并通过 GOLANG_EXTERNAL_BOOTSTRAP_ROOT 配置；同时把 Host/Make 的
-          # GOROOT_BOOTSTRAP 指向该外部 bootstrap（本地实测通过）。
-          GO_BOOTSTRAP_VER=go1.24.13
-          curl -fL --retry 3 -o /tmp/${GO_BOOTSTRAP_VER}.linux-amd64.tar.gz \
-            https://dl.google.com/go/${GO_BOOTSTRAP_VER}.linux-amd64.tar.gz
-          echo "1fc94b57134d51669c72173ad5d49fd62afb0f1db9bf3f798fd98ee423f8d730  /tmp/${GO_BOOTSTRAP_VER}.linux-amd64.tar.gz" | sha256sum -c -
-          mkdir -p /tmp/go-bootstrap
-          tar -C /tmp/go-bootstrap --strip-components=1 -xzf /tmp/${GO_BOOTSTRAP_VER}.linux-amd64.tar.gz
-          /tmp/go-bootstrap/bin/go version
-          # Host 编译 go1.26.8 时直接用外部 bootstrap，跳过 1.20 中间层
-          sed -i 's|GOROOT_BOOTSTRAP="\$(BOOTSTRAP_1_20_BUILD_DIR)"|GOROOT_BOOTSTRAP="$(BOOTSTRAP_ROOT_DIR)"|' \
-            feeds/packages/lang/golang/golang/Makefile
-          grep 'GOROOT_BOOTSTRAP="\$(BOOTSTRAP_ROOT_DIR)"' \
-            feeds/packages/lang/golang/golang/Makefile
-          echo "外部 bootstrap 就绪"
+      # - name: 准备 golang 外部 bootstrap（go1.26 需 >=1.24 编译）
+      #   run: |
+      #     cd openwrt
+      #     # golang feed 自带 bootstrap 链只到 go1.20（1.4 -> 1.17 -> 1.20），
+      #     # 而 go1.26.8 源码要求编译它的 bootstrap 是 go1.24.6+（notgo124.go 检查）。
+      #     # 方案：下载官方 go1.24.13 linux-amd64 预编译包作外部 bootstrap，
+      #     # 并通过 GOLANG_EXTERNAL_BOOTSTRAP_ROOT 配置；同时把 Host/Make 的
+      #     # GOROOT_BOOTSTRAP 指向该外部 bootstrap（本地实测通过）。
+      #     GO_BOOTSTRAP_VER=go1.24.13
+      #     curl -fL --retry 3 -o /tmp/${GO_BOOTSTRAP_VER}.linux-amd64.tar.gz \
+      #       https://dl.google.com/go/${GO_BOOTSTRAP_VER}.linux-amd64.tar.gz
+      #     echo "1fc94b57134d51669c72173ad5d49fd62afb0f1db9bf3f798fd98ee423f8d730  /tmp/${GO_BOOTSTRAP_VER}.linux-amd64.tar.gz" | sha256sum -c -
+      #     mkdir -p /tmp/go-bootstrap
+      #     tar -C /tmp/go-bootstrap --strip-components=1 -xzf /tmp/${GO_BOOTSTRAP_VER}.linux-amd64.tar.gz
+      #     /tmp/go-bootstrap/bin/go version
+      #     # Host 编译 go1.26.8 时直接用外部 bootstrap，跳过 1.20 中间层
+      #     sed -i 's|GOROOT_BOOTSTRAP="\$(BOOTSTRAP_1_20_BUILD_DIR)"|GOROOT_BOOTSTRAP="$(BOOTSTRAP_ROOT_DIR)"|' \
+      #       feeds/packages/lang/golang/golang/Makefile
+      #     grep 'GOROOT_BOOTSTRAP="\$(BOOTSTRAP_ROOT_DIR)"' \
+      #       feeds/packages/lang/golang/golang/Makefile
+      #     echo "外部 bootstrap 就绪"
 
       - name: 生成 .config
         run: |
