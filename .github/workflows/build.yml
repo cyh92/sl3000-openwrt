@@ -29,7 +29,7 @@ jobs:
 
       - name: 克隆 ImmortalWrt 24.10 源码
         run: |
-          git clone -b openwrt-24.10 --depth 1 \
+          git clone -b master --depth 1 \
             https://github.com/immortalwrt/immortalwrt.git openwrt
           cd openwrt
           echo "源码克隆完成"
